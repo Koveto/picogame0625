@@ -4,7 +4,7 @@ import time
 
 # === CONFIG ===
 TILE_SIZE = 16        # pixels per tile
-SCALE = 2             # 2x2 block per tile pixel
+SCALE = 1             # 2x2 block per tile pixel
 PIXEL_SIZE = SCALE    # convenience alias
 DISPLAY_WIDTH = 240
 DISPLAY_HEIGHT = 320
@@ -16,6 +16,29 @@ bl.duty_u16(32768)
 lcd = LCD.LCD_1inch3()
 
 # === UTILS ===
+def generate_tile_list(filename, img_width, img_height):
+    """Loads all tiles from the spritesheet into a list."""
+    tiles = []
+    tiles_x = img_width // 16
+    tiles_y = img_height // 16
+    for ty in range(tiles_y):
+        for tx in range(tiles_x):
+            tile = load_tile_from_binary(filename, tx, ty, img_width, img_height)
+            tiles.append(tile)
+    return tiles
+    
+def draw_tilemap(tilemap, tiles, x_offset=0, y_offset=0):
+    for row in range(len(tilemap)):
+        for col in range(len(tilemap[0])):
+            tile_id = tilemap[row][col]
+            tile = tiles[tile_id]
+            draw_tile_scaled(x_offset + col * 16, y_offset + row * 16, tile)
+
+def load_tilemap(filename, width, height):
+    with open(filename, "rb") as f:
+        raw = f.read(width * height)
+        return [list(raw[i * width:(i + 1) * width]) for i in range(height)]
+
 def draw_tile_scaled(x0, y0, tile_data):
     """Draw a 16x16 tile scaled to 32x32 on the screen."""
     for y in range(TILE_SIZE):
@@ -47,12 +70,16 @@ def load_tile_grid_binary(filename):
 
 # === MAIN LOOP ===
 if __name__ == "__main__":
-    lcd.fill(0xf1ff)  # beige background
+    lcd.fill(0x0000)  # beige background
     lcd.show()
 
-    tile = load_tile_from_binary("tiles0.bin", tile_x=2, tile_y=2, img_width=48, img_height=48)
+    #tile = load_tile_from_binary("tiles1.bin", tile_x=0, tile_y=0, img_width=160, img_height=113)
+    tilemap = load_tilemap("map0.bin", 17, 15)
+    tiles = generate_tile_list("tiles2.bin", 160, 113)
+    draw_tilemap(tilemap, tiles)
+    lcd.show()
 
     while True:
-        draw_tile_scaled(0, 0, tile)
-        lcd.show()
+        #draw_tile_scaled(0, 0, tile)
+        #lcd.show()
         time.sleep(10)
