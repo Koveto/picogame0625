@@ -74,7 +74,7 @@ if __name__ == "__main__":
     lcd.show()
 
     #tile = load_tile_from_binary("tiles1.bin", tile_x=0, tile_y=0, img_width=160, img_height=113)
-    tilemap = load_tilemap("map0.bin", 17, 15)
+    tilemap = load_tilemap("map3.bin", 17, 15)
     tiles = generate_tile_list("tiles2.bin", 160, 113)
     draw_tilemap(tilemap, tiles)
     lcd.show()
